@@ -1,37 +1,85 @@
 package parser
 
 import (
-	"strings"
-
 	"github.com/nirlanka/evillang/ast"
+	"github.com/nirlanka/evillang/lexer"
 )
 
-func Parse(input string) *ast.Program {
-	lines := strings.Split(input, "\n")
+type Parser struct {
+	lexer     *lexer.Lexer
+	curToken  lexer.Token
+	peekToken lexer.Token
+}
 
-	var statements []ast.Node
+func New(l *lexer.Lexer) *Parser {
+	p := &Parser{lexer: l}
 
-	for _, line := range lines {
-		line = strings.TrimSpace(line)
+	// Load two tokens to init - curToken, peekToken
+	p.nextToken()
+	p.nextToken()
 
-		if strings.HasPrefix(line, "ref ") {
-			// Format: ref Type name = value;
-			rest := strings.TrimPrefix(line, "ref ")
-			tokens := strings.Fields(rest) // ["String", "foo", "=", "\"abc\";"]
+	return p
+}
 
-			if len(tokens) >= 4 && tokens[2] == "=" {
-				typename := tokens[0]
-				name := tokens[1]
-				value := strings.TrimSuffix(strings.Join(tokens[3:], " "), ";")
+func (p *Parser) nextToken() {
+	p.curToken = p.peekToken
+	p.peekToken = p.lexer.NextToken()
+}
 
-				statements = append(statements, &ast.RefDeclaration{
-					TypeName: typename,
-					Name:     name,
-					Value:    value,
-				})
-			}
+func (p *Parser) ParseProgram() *ast.Program {
+	program := &ast.Program{}
+
+	for p.curToken.Type != lexer.EOF {
+		statement := p.parseRefDeclaration() // TODO
+
+		if statement != nil {
+			program.Statements = append(program.Statements, statement)
 		}
+
+		p.nextToken()
 	}
 
-	return &ast.Program{Statements: statements}
+	return program
+}
+
+func (p *Parser) parseRefDeclaration() *ast.RefDeclaration {
+	if p.curToken.Type != lexer.REF {
+		return nil
+	}
+
+	// Except: TYPE
+	p.nextToken()
+	if p.curToken.Type != lexer.TYPE {
+		return nil
+	}
+	typename := p.curToken.Literal
+
+	// Expect: IDENT
+	p.nextToken()
+	if p.curToken.Type != lexer.IDENT {
+		return nil
+	}
+	name := p.curToken.Literal
+
+	// Expect: =
+	p.nextToken()
+	if p.curToken.Type != lexer.ASSIGN {
+		return nil
+	}
+
+	// Expect: STRING or NUMBER
+	p.nextToken()
+	value := p.curToken.Literal
+
+	// Expect: ;
+	p.nextToken()
+	if p.curToken.Type != lexer.SEMICOLON {
+		return nil
+	}
+
+	return &ast.RefDeclaration{
+		TypeName: typename,
+		Name:     name,
+		Value:    value,
+	}
 }

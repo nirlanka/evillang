@@ -3,7 +3,9 @@ package main
 import (
 	"fmt"
 
+	"github.com/nirlanka/evillang/compiler"
 	"github.com/nirlanka/evillang/lexer"
+	"github.com/nirlanka/evillang/parser"
 )
 
 func main() {
@@ -20,11 +22,24 @@ func main() {
 	// fmt.Println(output)
 
 	//// TEMP
-	input := `ref String foo = "abc";`
+	// input := `ref String foo = "abc";`
 
-	lex := lexer.New(input)
+	// lex := lexer.New(input)
 
-	for tok := lex.NextToken(); tok.Type != lexer.EOF; tok = lex.NextToken() {
-		fmt.Printf("%+v\n", tok)
-	}
+	// for tok := lex.NextToken(); tok.Type != lexer.EOF; tok = lex.NextToken() {
+	// 	fmt.Printf("%+v\n", tok)
+	// }
+
+	//// TEMP
+	source := `
+	ref String foo="abc";
+	ref Number x=42;
+	`
+
+	lex := lexer.New(source)
+	par := parser.New(lex)
+	prog := par.ParseProgram()
+
+	js := compiler.Compile(prog)
+	fmt.Println(js)
 }
