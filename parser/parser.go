@@ -15,15 +15,21 @@ func Parse(input string) *ast.Program {
 		line = strings.TrimSpace(line)
 
 		if strings.HasPrefix(line, "ref ") {
-			parts := strings.Split(line, "=")
+			// Format: ref Type name = value;
+			rest := strings.TrimPrefix(line, "ref ")
+			tokens := strings.Fields(rest) // ["String", "foo", "=", "\"abc\";"]
 
-			name := strings.TrimSpace((strings.TrimPrefix(parts[0], "ref")))
-			value := strings.TrimSpace(strings.TrimSuffix(parts[1], ";"))
+			if len(tokens) >= 4 && tokens[2] == "=" {
+				typename := tokens[0]
+				name := tokens[1]
+				value := strings.TrimSuffix(strings.Join(tokens[3:], " "), ";")
 
-			statements = append(statements, &ast.RefDeclaration{
-				Name:  name,
-				Value: value,
-			})
+				statements = append(statements, &ast.RefDeclaration{
+					TypeName: typename,
+					Name:     name,
+					Value:    value,
+				})
+			}
 		}
 	}
 

@@ -9,13 +9,14 @@ import (
 
 func main() {
 	input := `
-		ref a = 42;
-		ref b = "hi";
+		ref TBaseInteger a = 42;
+		ref TBaseString b = "hi";
 	`
 
 	ast := parser.Parse(input)
 	output := compiler.Compile(ast)
 
 	fmt.Println("// Compiled JS:")
+	fmt.Println("import * from 'eviltypes';")
 	fmt.Println(output)
 }

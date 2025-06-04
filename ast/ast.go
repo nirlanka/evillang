@@ -9,10 +9,11 @@ type Program struct {
 }
 
 type RefDeclaration struct {
-	Name  string
-	Value string
+	TypeName string
+	Name     string
+	Value    string
 }
 
-func (c *RefDeclaration) String() string {
-	return "const " + c.Name + " = " + c.Value + ";"
+func (r *RefDeclaration) String() string {
+	return "/** @type {" + r.TypeName + "} */\n" + "const " + r.Name + " = new " + r.TypeName + "().set(" + r.Value + ");"
 }
