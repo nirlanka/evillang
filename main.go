@@ -31,12 +31,20 @@ func main() {
 	// }
 
 	//// TEMP
-	source := `
-	ref String foo="abc";
-	ref Number x=42;
-	`
+	source := `ref String foo = "abc";
+		ref Integer x = 42;`
+	// ^^^ tab may break parsing
 
 	lex := lexer.New(source)
+
+	// for {
+	// 	tok := lex.NextToken()
+	// 	fmt.Printf("%+v\n", tok)
+	// 	if tok.Type == lexer.EOF {
+	// 		break
+	// 	}
+	// }
+
 	par := parser.New(lex)
 	prog := par.ParseProgram()
 

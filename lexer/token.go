@@ -6,11 +6,11 @@ const (
 	ILLEGAL   TokenType = "ILLEGAL"
 	EOF                 = "EOF"
 	IDENT               = "IDENT"
-	STRING              = "REF "
+	STRING              = "STRING"
 	NUMBER              = "NUMBER "
 	ASSIGN              = "="
 	SEMICOLON           = ";"
-	REF                 = "STRING "
+	REF                 = "REF "
 	TYPE                = "TYPE"
 )
 

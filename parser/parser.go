@@ -30,13 +30,16 @@ func (p *Parser) ParseProgram() *ast.Program {
 	program := &ast.Program{}
 
 	for p.curToken.Type != lexer.EOF {
-		statement := p.parseRefDeclaration() // TODO
+		statement := p.parseRefDeclaration()
 
 		if statement != nil {
+			// fmt.Println("Parsed statement:", statement)
 			program.Statements = append(program.Statements, statement)
+		} else {
+			p.nextToken()
 		}
 
-		p.nextToken()
+		// p.nextToken()
 	}
 
 	return program
