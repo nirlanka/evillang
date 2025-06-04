@@ -46,14 +46,11 @@ func (l *Lexer) NextToken() Token {
 		if isLetter(l.ch) {
 			ident := l.readIdentifier()
 
-			switch ident {
-			case "ref":
-				return Token{Type: REF, Literal: ident}
-			case "String", "Integer", "Float", "Boolean", "Object":
-				return Token{Type: TYPE, Literal: ident}
-			default:
-				return Token{Type: IDENT, Literal: ident}
+			if tokType, ok := Keywords[ident]; ok {
+				return Token{Type: tokType, Literal: ident}
 			}
+
+			return Token{Type: IDENT, Literal: ident}
 		} else if isDigit(l.ch) {
 			return l.readNumber()
 		} else {

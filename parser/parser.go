@@ -38,8 +38,6 @@ func (p *Parser) ParseProgram() *ast.Program {
 		} else {
 			p.nextToken()
 		}
-
-		// p.nextToken()
 	}
 
 	return program
