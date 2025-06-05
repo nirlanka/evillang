@@ -114,7 +114,7 @@ func (p *Parser) ParseProgram() *ast.Program {
 		stment, err := p.parseStatement() // generic statement parser
 		if err != nil {
 			fmt.Println()
-			panic(fmt.Sprintf("\nError: \n- %s\n]", *err))
+			panic(fmt.Sprintf("\nError: \n- %s\n]\n", *err))
 		}
 		program.Statements = append(program.Statements, stment)
 	}
