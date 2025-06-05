@@ -12,8 +12,8 @@ func main() {
 	source := `
 		ref string foo = "abc";
 		ref int x = 42;
-		ref int x = 1.3;
-		ref int x = -99_999;
+		ref float y = 1.3;
+		ref int z = -99_999;
 	`
 
 	lex := lexer.New(source)

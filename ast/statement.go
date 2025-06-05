@@ -1,6 +1,10 @@
 package ast
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/nirlanka/evillang/lexer"
+)
 
 // Generic statement
 type Statement interface {
@@ -19,7 +23,7 @@ type RefStatement struct {
 func (r *RefStatement) statementNode() {}
 
 func (r *RefStatement) String() string {
-	// TODO: Add type alias resolution/type-name transformations if needed
+	targetType := lexer.PrimitiveTypes[r.TypeName]
 
-	return fmt.Sprintf("/** @type {%s} */\nconst %s = new %s().set(%s);", r.TypeName, r.Name, r.TypeName, r.Value)
+	return fmt.Sprintf("/** @type {%s} */\nconst %s = new %s().set(%s);", targetType, r.Name, r.TypeName, r.Value)
 }

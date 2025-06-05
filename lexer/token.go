@@ -29,3 +29,11 @@ var Keywords = map[string]TokenSpecies{
 	"bool":   PRIMITIVE_TYPE,
 	"map":    PRIMITIVE_TYPE,
 }
+
+var PrimitiveTypes = map[string]string{
+	"string": "TString",
+	"int":    "TInteger",
+	"float":  "TFloat",
+	"bool":   "TBoolean",
+	"map":    "TMap",
+}
