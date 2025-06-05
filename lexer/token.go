@@ -9,15 +9,15 @@ type TokenSpecies string
 
 // TokenType values:
 const (
-	ILLEGAL   TokenSpecies = "ILLEGAL"
-	EOF                    = "EOF"
-	IDENT                  = "IDENT"
-	STRING                 = "STRING"
-	NUMBER                 = "NUMBER"
-	ASSIGN                 = "="
-	SEMICOLON              = ";"
-	REF                    = "REF"
-	TYPE                   = "TYPE"
+	ILLEGAL        TokenSpecies = "ILLEGAL"
+	EOF                         = "EOF"
+	IDENT                       = "IDENT"
+	INLINE_STRING               = "STRING"
+	DECIMAL_NUMBER              = "NUMBER"
+	ASSIGN                      = "="
+	SEMICOLON                   = ";"
+	REF                         = "REF"
+	TYPE                        = "TYPE"
 )
 
 var Keywords = map[string]TokenSpecies{
