@@ -8,10 +8,11 @@ import (
 type Lexer struct {
 	input string
 
-	nextPos int // ~ curPos + 1
-	curPos  int // currently reading
+	// nextPos ~ readPos + 1
+	nextPos int // ready to read
+	readPos int // read position
 
-	curCh byte
+	nextCh byte // read character
 
 	curStr string
 }
@@ -27,31 +28,34 @@ func New(input string) *Lexer {
 // Set pos and ch
 
 func (l *Lexer) readChar() {
-	if l.curPos >= len(l.input) {
-		l.curCh = 0 // ACII NUL --> end of input
+	s := string(l.nextCh)
+	fmt.Print(s) // DEBUG
+
+	if l.readPos >= len(l.input) {
+		l.nextCh = 0 // ASCII NUL --> end of input
 	} else {
-		l.curCh = l.input[l.curPos]
+		l.nextCh = l.input[l.readPos]
 	}
 
-	l.curPos = l.nextPos
-	l.nextPos++
+	l.nextPos = l.readPos
+	l.readPos++
 }
 
 func (l *Lexer) resetStr() {
 	l.curStr = ""
 }
 
-func (l *Lexer) readStr() {
+func (l *Lexer) readStrText() {
 	l.readChar() // skip opening quote
 
 	l.resetStr()
 
-	start := l.curPos
-	for l.curCh != '"' && l.curCh != 0 {
+	start := l.nextPos
+	for l.nextCh != '"' && l.nextCh != 0 {
 		l.readChar()
 	}
 
-	l.curStr = l.input[start:l.curPos]
+	l.curStr = l.input[start:l.nextPos]
 
 	l.readChar() // skip closing quote
 }
@@ -59,20 +63,20 @@ func (l *Lexer) readStr() {
 func (l *Lexer) readDecimalNumber() {
 	l.resetStr()
 
-	start := l.curPos
+	start := l.nextPos
 
 	// Positive / negative / decimal-point / digit:
 
 	decimalDotCount := 0
 
-	if isDecimalpoint(l.curCh) {
+	if isDecimalpoint(l.nextCh) {
 		decimalDotCount++
 		l.readChar()
 	}
 
 	positiveNegativeCount := 0
 
-	if isPositiveSym(l.curCh) || isNegativeSym(l.curCh) {
+	if isPositiveSym(l.nextCh) || isNegativeSym(l.nextCh) {
 		positiveNegativeCount++
 		l.readChar()
 	}
@@ -80,32 +84,30 @@ func (l *Lexer) readDecimalNumber() {
 	// The rest:
 
 	for (decimalDotCount <= 1) &&
-		(isDigit(l.curCh) || isDecimalpoint(l.curCh) || isUnderscore(l.curCh)) {
-		if isDecimalpoint(l.curCh) {
+		(isDigit(l.nextCh) || isDecimalpoint(l.nextCh) || isUnderscore(l.nextCh)) {
+		if isDecimalpoint(l.nextCh) {
 			decimalDotCount++
 		}
 
 		l.readChar()
 	}
 
-	l.curStr = l.input[start:l.curPos]
+	l.curStr = l.input[start:l.nextPos]
 }
 
 func (l *Lexer) readIdentifier() {
 	l.resetStr()
 
-	start := l.curPos
-	for isLetter(l.curCh) || isDigit(l.curCh) || isUnderscore(l.curCh) {
+	start := l.readPos - 1
+	for isLetter(l.nextCh) || isDigit(l.nextCh) || isUnderscore(l.nextCh) {
 		l.readChar()
 	}
 
-	l.curStr = l.input[start:l.curPos]
+	l.curStr = l.input[start:l.nextPos]
 }
 
 func (l *Lexer) skipWhitespace() {
-	for isWhitespace(l.curCh) {
-		s := string(l.curCh)
-		fmt.Println(s)
+	for isWhitespace(l.nextCh) {
 		l.readChar()
 	}
 }
@@ -116,7 +118,7 @@ func (l *Lexer) ReadToken() Token {
 	l.skipWhitespace()
 	l.resetStr()
 
-	switch l.curCh {
+	switch l.nextCh {
 	case '=':
 		l.readChar()
 		return Token{Species: ASSIGN, Literal: "="}
@@ -124,29 +126,33 @@ func (l *Lexer) ReadToken() Token {
 		l.readChar()
 		return Token{Species: SEMICOLON, Literal: ";"}
 	case '"':
-		l.readStr()
-		return Token{Species: INLINE_STRING, Literal: l.curStr}
+		l.readStrText()
+		return Token{Species: INLINE_STRING, Literal: `"` + l.curStr + `"`}
 	case 0:
 		return Token{Species: EOF, Literal: ""}
 	default:
-		if isLetter(l.curCh) || isUnderscore(l.curCh) {
+		if isLetter(l.nextCh) || isUnderscore(l.nextCh) {
 			l.readIdentifier()
 			ident := l.curStr
 
-			if tokSpecies, ok := Keywords[ident]; ok {
+			if tokSpecies, exists := Keywords[ident]; exists {
 				return Token{Species: tokSpecies, Literal: ident}
 			}
 
-			if isStartsUppercase(ident) || isStartsUnderscoreAndUppercase(ident) {
-				return Token{Species: TYPE, Literal: ident}
+			if isPrimitiveType(ident) {
+				return Token{Species: PRIMITIVE_TYPE, Literal: ident}
+			}
+
+			if isCustomTypeLike(ident) {
+				return Token{Species: CUSTOM_TYPE, Literal: ident}
 			}
 
 			return Token{Species: IDENT, Literal: ident}
-		} else if isDigit(l.curCh) {
+		} else if isDigit(l.nextCh) {
 			l.readDecimalNumber()
 			return Token{Species: DECIMAL_NUMBER, Literal: l.curStr}
 		} else {
-			return Token{Species: ILLEGAL, Literal: string(l.curCh)}
+			return Token{Species: ILLEGAL, Literal: string(l.nextCh)}
 		}
 	}
 }
@@ -176,6 +182,18 @@ func isStartsLowercase(s string) bool {
 
 	r := []rune(s)[0]
 	return unicode.IsLower(r)
+}
+
+func isCustomTypeLike(ident string) bool {
+	return isStartsUppercase(ident) || isStartsUnderscoreAndUppercase(ident)
+}
+
+func isPrimitiveType(ident string) bool {
+	if tokSpecies, exists := Keywords[ident]; exists && tokSpecies == PRIMITIVE_TYPE {
+		return true
+	}
+
+	return false
 }
 
 func isStartsUnderscoreAndLowercase(s string) bool {

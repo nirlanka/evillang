@@ -9,6 +9,11 @@ import (
 )
 
 func main() {
+	// source := `
+	// 	= ref string foo = "abc";
+	// 	ref int x = 42;
+	// `
+
 	source := `
 		ref string foo = "abc";
 		ref int x = 42;
