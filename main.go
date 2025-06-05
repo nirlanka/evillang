@@ -19,6 +19,8 @@ func main() {
 		ref string foo = "abc";
 		ref int x = 42;
 		ref ApiApp app = 42;
+
+		x = 5;
 		`
 
 	// TODO: Ignore // lines
