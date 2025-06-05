@@ -50,6 +50,10 @@ func (l *Lexer) NextToken() Token {
 				return Token{Type: tokType, Literal: ident}
 			}
 
+			if isTypeName(ident) {
+				return Token{Type: TYPE, Literal: ident}
+			}
+
 			return Token{Type: IDENT, Literal: ident}
 		} else if isDigit(l.ch) {
 			return l.readNumber()
@@ -105,4 +109,17 @@ func (l *Lexer) readNumber() Token {
 	}
 
 	return Token{Type: NUMBER, Literal: l.input[start:l.position]}
+}
+
+func isTypeName(s string) bool {
+	return startsWithUppercase(s)
+}
+
+func startsWithUppercase(s string) bool {
+	if s == "" {
+		return false
+	}
+
+	r := []rune(s)[0]
+	return unicode.IsUpper(r)
 }

@@ -9,10 +9,20 @@ import (
 )
 
 func main() {
+	// source := `
+	// 	ref String foo = "abc";
+	// 	ref Integer x = 42;
+	// 	ref Float y = 1.2;
+	// 	ref ApiApp app = 42;
+	// 	`
 	source := `
-		ref String foo = "abc";
-		ref Integer x = 42;
+		ref string foo = "abc";
+		ref int x = 42;
+		ref ApiApp app = 42;
 		`
+
+	// TODO: Ignore // lines
+	// TODO: Handle Float values
 
 	lex := lexer.New(source)
 

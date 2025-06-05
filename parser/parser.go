@@ -1,6 +1,8 @@
 package parser
 
 import (
+	"fmt"
+
 	"github.com/nirlanka/evillang/ast"
 	"github.com/nirlanka/evillang/lexer"
 )
@@ -31,6 +33,7 @@ func (p *Parser) ParseProgram() *ast.Program {
 
 	for p.curToken.Type != lexer.EOF {
 		statement := p.parseRefDeclaration()
+		// TODO: Add other types than ref-declarations
 
 		if statement != nil {
 			// fmt.Println("Parsed statement:", statement)
@@ -51,6 +54,7 @@ func (p *Parser) parseRefDeclaration() *ast.RefDeclaration {
 	// Except: TYPE
 	p.nextToken()
 	if p.curToken.Type != lexer.TYPE {
+		fmt.Printf("Parse error: expected TYPE after 'ref', got %q (%s)", p.curToken.Literal, p.curToken.Type)
 		return nil
 	}
 	typename := p.curToken.Literal

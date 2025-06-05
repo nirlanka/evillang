@@ -14,6 +14,21 @@ type RefDeclaration struct {
 	Value    string
 }
 
+var TypeKeywordTargets = map[string]string{
+	"string": "TBaseString",
+	"int":    "TBaseInteger",
+	"float":  "TBaseFloat",
+	"bool":   "TBaseBoolean",
+	"object": "TBaseObject",
+}
+
 func (r *RefDeclaration) String() string {
-	return "/** @type {" + r.TypeName + "} */\n" + "const " + r.Name + " = new " + r.TypeName + "().set(" + r.Value + ");"
+	var typeName string
+	if tokType, ok := TypeKeywordTargets[r.TypeName]; ok {
+		typeName = tokType
+	} else {
+		typeName = r.TypeName
+	}
+
+	return "/** @type {" + r.TypeName + "} */\n" + "const " + r.Name + " = new " + typeName + "().set(" + r.Value + ");"
 }

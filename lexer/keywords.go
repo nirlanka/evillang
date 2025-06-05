@@ -15,10 +15,10 @@ const (
 )
 
 var Keywords = map[string]TokenType{
-	"ref":     REF,
-	"String":  TYPE,
-	"Integer": TYPE,
-	"Float":   TYPE,
-	"Boolean": TYPE,
-	"Object":  TYPE,
+	"ref":    REF,
+	"string": TYPE,
+	"int":    TYPE,
+	"float":  TYPE,
+	"bool":   TYPE,
+	"object": TYPE,
 }
