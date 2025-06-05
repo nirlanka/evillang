@@ -148,7 +148,10 @@ func (l *Lexer) ReadToken() Token {
 			}
 
 			return Token{Species: IDENT, Literal: ident}
-		} else if isDigit(l.nextCh) {
+		} else if isPositiveSym(l.nextCh) ||
+			isNegativeSym(l.nextCh) ||
+			isDecimalpoint(l.nextCh) ||
+			isDigit(l.nextCh) {
 			l.readDecimalNumber()
 			return Token{Species: DECIMAL_NUMBER, Literal: l.curStr}
 		} else {
