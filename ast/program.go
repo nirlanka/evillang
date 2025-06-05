@@ -1,3 +1,5 @@
 package ast
 
-type Program struct{}
+type Program struct {
+	Statements []Statement
+}
